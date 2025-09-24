@@ -1,11 +1,18 @@
 app = "new-backend-001"
 
 [build]
-  image = "openjdk:17-jdk-slim"
-
-[deploy]
-  release_command = "java -jar /app.jar"
+  # use a simple buildpack for Java apps
+  builder = "paketobuildpacks/builder:base"
 
 [env]
   PORT = "8080"
 
+[[services]]
+  internal_port = 8080
+  protocol = "tcp"
+
+  [[services.ports]]
+    port = 80
+
+  [[services.ports]]
+    port = 443
