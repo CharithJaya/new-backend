@@ -1,17 +1,12 @@
-app = "new-backend"
-
-kill_signal = "SIGINT"
-kill_timeout = 5
+app = "new-backend"  # Your Fly.io app name
 
 [build]
-  dockerfile = "Dockerfile"
+  dockerfile = "Dockerfile"   # Explicitly tell Fly.io to use your Dockerfile
 
 [env]
-  # Optional: set your Spring profile
+  # Optional: any environment variables for your Spring Boot app
   SPRING_PROFILES_ACTIVE = "prod"
 
-[deploy]
-  release_command = "./mvnw fly:deploy"  # optional, you can leave empty if no release steps
-
 [experimental]
-  allowed_public_ports = [8080]
+  allowed_public_ports = []
+  auto_rollback = true
