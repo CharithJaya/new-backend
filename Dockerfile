@@ -1,23 +1,19 @@
-# Use Java 17 runtime
-FROM eclipse-temurin:17-jdk AS build
+# Use Java 17
+FROM eclipse-temurin:17-jdk
 
 WORKDIR /app
 
-# Copy project files
+# Copy everything
 COPY . .
 
-# Package the application (skip tests for speed)
+# Give execution permission to Maven wrapper
+RUN chmod +x mvnw
+
+# Build the JAR
 RUN ./mvnw clean package -DskipTests
 
-# -----------------------------
-# Final lightweight image
-# -----------------------------
-FROM eclipse-temurin:17-jdk-jammy
-
-WORKDIR /app
-
-# Copy the built JAR from build stage
-COPY --from=build /app/target/*.jar app.jar
+# Copy the built JAR to app.jar
+RUN cp target/*.jar app.jar
 
 # Run the JAR
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+ENTRYPOINT ["java","-jar","/app.jar"]
