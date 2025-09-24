@@ -1,1 +1,11 @@
+app = "new-backend-001"
+
+[build]
+  image = "openjdk:17-jdk-slim"
+
+[deploy]
+  release_command = "java -jar /app.jar"
+
+[env]
+  PORT = "8080"
 
