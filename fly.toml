@@ -1,4 +1,5 @@
 app = "new-backend"
+
 kill_signal = "SIGINT"
 kill_timeout = 5
 
@@ -6,14 +7,11 @@ kill_timeout = 5
   dockerfile = "Dockerfile"
 
 [env]
-  PORT = "8080"
+  # Optional: set your Spring profile
+  SPRING_PROFILES_ACTIVE = "prod"
 
-[[services]]
-  internal_port = 8080
-  protocol = "tcp"
+[deploy]
+  release_command = "./mvnw fly:deploy"  # optional, you can leave empty if no release steps
 
-  [[services.ports]]
-    port = 80
-
-  [[services.ports]]
-    port = 443
+[experimental]
+  allowed_public_ports = [8080]
