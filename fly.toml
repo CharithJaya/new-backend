@@ -1,8 +1,8 @@
 app = "new-backend-001"
 
 [build]
-  # use a simple buildpack for Java apps
-  builder = "paketobuildpacks/builder:base"
+  # Use your Dockerfile instead of a buildpack
+  dockerfile = "Dockerfile"
 
 [env]
   PORT = "8080"
