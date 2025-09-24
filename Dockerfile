@@ -3,10 +3,19 @@ FROM eclipse-temurin:17-jdk
 
 WORKDIR /app
 
-# Copy everything
-COPY . .
+# Copy Maven wrapper and pom.xml first for dependency caching
+COPY mvnw .
+COPY mvnw.cmd .
+COPY .mvn .mvn
+COPY pom.xml .
 
-# Build the JAR
+# Download dependencies (offline mode)
+RUN ./mvnw dependency:go-offline -B
+
+# Copy source code
+COPY src src
+
+# Build the Spring Boot JAR
 RUN ./mvnw clean package -DskipTests
 
 # Copy the built JAR to app.jar
