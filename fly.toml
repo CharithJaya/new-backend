@@ -1,12 +1,17 @@
-app = "new-backend"  # Your Fly.io app name
+app = "new-backend"
 
 [build]
-  dockerfile = "Dockerfile"   # Explicitly tell Fly.io to use your Dockerfile
+  dockerfile = "Dockerfile"
 
 [env]
-  # Optional: any environment variables for your Spring Boot app
-  SPRING_PROFILES_ACTIVE = "prod"
+  PORT = "8080"
 
-[experimental]
-  allowed_public_ports = []
-  auto_rollback = true
+[[services]]
+  internal_port = 8080
+  protocol = "tcp"
+
+  [[services.ports]]
+    port = 80
+
+  [[services.ports]]
+    port = 443
