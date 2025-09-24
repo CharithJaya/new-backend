@@ -1,26 +1,26 @@
 # Use Java 17
 FROM eclipse-temurin:17-jdk
 
-# Set working directory
+# Set working directory inside the container
 WORKDIR /app
 
-# Copy Maven wrapper and pom.xml first (for dependency caching)
-COPY mvnw mvnw
-COPY mvnw.cmd mvnw.cmd
+# Copy Maven wrapper and project files
+COPY mvnw .
+COPY mvnw.cmd .
 COPY .mvn .mvn
-COPY pom.xml pom.xml
+COPY pom.xml .
 
-# Download dependencies
+# Download dependencies (offline)
 RUN ./mvnw dependency:go-offline -B
 
-# Copy source code
+# Copy the source code
 COPY src src
 
-# Build the Spring Boot JAR (skip tests)
+# Build the JAR (skip tests for faster build)
 RUN ./mvnw clean package -DskipTests
 
-# Copy the built JAR to a consistent name
+# Copy the built JAR to a simple name
 RUN cp target/*.jar app.jar
 
 # Run the JAR
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
