@@ -1,41 +1,35 @@
-#
-# A correct multi-stage Dockerfile for a Spring Boot application
-#
+# Use OpenJDK 17 as base image
+FROM openjdk:17-jdk-slim
 
-# --- Stage 1: Build the application ---
-# Use a full JDK image to build the application.
-FROM eclipse-temurin:17-jdk as build
-
-# Set the working directory inside the container.
+# Set working directory
 WORKDIR /app
 
-# Copy the Maven project files first to leverage Docker's build cache.
-COPY pom.xml .
-COPY mvnw .
-COPY mvnw.cmd .
-COPY .mvn .mvn
+# Copy Maven wrapper and pom.xml (for dependency caching)
+COPY .mvn/ .mvn
+COPY mvnw pom.xml ./
 
-# Download all dependencies.
-RUN ./mvnw dependency:go-offline -B
+# Download dependencies (this layer will be cached unless pom.xml changes)
+RUN chmod +x ./mvnw && ./mvnw dependency:go-offline
 
-# Copy the rest of the source code.
-COPY src src
+# Copy source code
+COPY src ./src
 
-# Build the Spring Boot application, creating a runnable JAR file.
+# Build the application
 RUN ./mvnw clean package -DskipTests
 
-# --- Stage 2: Create the final, lightweight image ---
-# Use a minimal JRE (Java Runtime Environment) to run the application.
-FROM eclipse-temurin:17-jre
+# Create final image
+FROM openjdk:17-jdk-slim
 
-# Set the working directory for the final image.
 WORKDIR /app
 
-# Copy the built JAR file from the 'build' stage into this new image.
-COPY --from=build /app/target/*.jar app.jar
+# Copy the built JAR from previous stage
+COPY --from=0 /app/target/*.jar app.jar
 
-# Expose the port on which the application will run.
+# Expose port 8080
 EXPOSE 8080
 
-# Define the command to run the application when the container starts.
-CMD ["java", "-jar", "app.jar"]
+# Set JVM options for containerized environment
+ENV JAVA_OPTS="-Xmx512m -Xms256m"
+
+# Run the application
+CMD ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
